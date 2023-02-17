@@ -54,7 +54,16 @@ module.exports = {
   create: async (ctx) => {
     // pegar as informacoes do frontend
     const { cart, paymentIntentId, paymentMethod } = ctx.request.body
-    // pegar o usuario
+
+    // pegar o token
+    const token = await strapi.plugins["users-permissions"].services.jwt.getToken(ctx)
+
+    // pega o id do usuario
+    const userId = token.id
+
+    // pegar as informacoes do usuario
+    const userInfo = await strapi.query("user", "users-permissions").findOne({ id: userId })
+
     // pegar os jogos
     // pegar o total (saber se eh free ou nao)
     // pegar o paymentIntentId
@@ -62,6 +71,6 @@ module.exports = {
     // salvar no banco 
     // enviar um email de compra para o usuario
 
-    return { cart, paymentIntentId, paymentMethod }
+    return { cart, paymentIntentId, paymentMethod, userInfo }
   }
 };
