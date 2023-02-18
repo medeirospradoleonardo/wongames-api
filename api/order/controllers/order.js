@@ -67,13 +67,22 @@ module.exports = {
 
     // precisa pegar do frontend os valores do paymentMethod
     // e recuperar por aqui
+    let paymentInfo
+    if (total_in_cents !== 0) {
+      try {
+        paymentInfo = await stripe.paymentMethods.retrieve(paymentMethod)
+      } catch (err) {
+        ctx.response.status = 402
+        return { error: err.message }
+      }
+    }
 
     // salvar no banco 
     const entry = {
       total_in_cents,
       payment_intent_id: paymentIntentId,
-      card_brand: null,
-      card_last4: null,
+      card_brand: paymentInfo?.card?.brand,
+      card_last4: paymentInfo?.card?.last4,
       user: userInfo,
       games
     }
